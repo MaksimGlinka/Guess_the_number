@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Угадай число</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .wins {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            color: #333;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #e7e7e7;
+        }
+        .win-message {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .lose-message {
+            background-color: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .hint-message {
+            background-color: #2196F3;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        input[type="number"] {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 200px;
+        }
+        .game-status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="wins">Победы: {{.Wins}}</div>
+    <div class="container">
+        <h1>Угадай число</h1>
+        
+        {{if not .GameStarted}}
+            {{if eq .Message "Поздравляем! Вы угадали число!"}}
+                <div class="win-message">
+                    <h2>🎉 Победа! 🎉</h2>
+                    <p>{{.Message}}</p>
+                </div>
+            {{else if contains .Message "Игра окончена!"}}
+                <div class="lose-message">
+                    <h2>😢 Игра окончена!</h2>
+                    <p>{{.Message}}</p>
+                </div>
+            {{end}}
+            <h2>Выберите уровень сложности:</h2>
+            <form action="/start" method="post">
+                <button class="button" name="level" value="1">Уровень 1 (0-10)</button>
+                <button class="button" name="level" value="2">Уровень 2 (0-50)</button>
+                <button class="button" name="level" value="3">Уровень 3 (0-100)</button>
+            </form>
+        {{else}}
+            {{if contains .Message "больше"}}
+                <div class="hint-message">{{.Message}}</div>
+            {{else if contains .Message "меньше"}}
+                <div class="hint-message">{{.Message}}</div>
+            {{else}}
+                <div class="message">{{.Message}}</div>
+            {{end}}
+            
+            {{if gt .Attempts 0}}
+                <div class="game-status">
+                    <form action="/guess" method="post">
+                        <input type="number" name="guess" placeholder="Введите число" required>
+                        <button class="button" type="submit">Угадать</button>
+                    </form>                    <p>Осталось попыток: {{.Attempts}}</p>
+                </div>
+            {{else}}
+                <form action="/start" method="post">
+                    <button class="button" name="level" value="{{.Level}}">Начать новую игру</button>
+                </form>
+            {{end}}
+        {{end}}
+    </div>
+</body>
+</html>
